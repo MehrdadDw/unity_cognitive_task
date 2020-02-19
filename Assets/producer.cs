@@ -22,7 +22,7 @@ public class producer : MonoBehaviour
 
 
     private bool finished;
-    private Dictionary<int, bool> Result;
+    private List<Tuple<int, bool>> Result;
     private int current_lvl;
     private DateTime next_time;
     
@@ -35,7 +35,7 @@ public class producer : MonoBehaviour
         Exprement = new Exprement(start_frac,dot_prefab,total_dots,scale);
      
         LoadConfig();
-        Result = new Dictionary<int, bool>();
+        Result = new List<Tuple<int, bool>>();
         next_time = DateTime.Now;
         finished = false;
         current_lvl = 0;
@@ -73,9 +73,9 @@ public class producer : MonoBehaviour
         //time out
         if (DateTime.Now > next_time && Exprement.IsInversionOK() )
         {
-            if (Exprement.level>0 && !Result.ContainsKey(current_lvl))
+            if (Exprement.level>0 )
             {
-                Result.Add(Exprement.level, false);
+                Result.Add(Tuple.Create( Exprement.level, false));
             }
             next_time = DateTime.Now + TimeSpan.FromSeconds(interval_sec);
             Exprement.next_level(false);
@@ -86,7 +86,7 @@ public class producer : MonoBehaviour
             {
                 //correct
                 Debug.Log($"true: {Exprement.Correct_keyCode().ToString()} is pressed");
-                Result.Add(current_lvl, true);
+                Result.Add(Tuple.Create(Exprement.level, true));
                 current_lvl++;
                 next_time = DateTime.Now + TimeSpan.FromSeconds(interval_sec);
                 Exprement.next_level(true);
@@ -94,9 +94,9 @@ public class producer : MonoBehaviour
             else
             {
                 //pressed wrong
-                if (current_lvl > 0 && !Result.ContainsKey(current_lvl))
+                if (current_lvl > 0)
                 {
-                    Result.Add(current_lvl, false);
+                    Result.Add(Tuple.Create(Exprement.level, false));
                 }
                 current_lvl++;
                 next_time = DateTime.Now + TimeSpan.FromSeconds(interval_sec);
@@ -107,7 +107,7 @@ public class producer : MonoBehaviour
         if (DateTime.Now > next_time && Exprement.IsInversionOK() & !finished)
         {
             //Exprement.Finish();
-            FileUtil.save_result(Result, "Username");
+           // FileUtil.save_result(Result, "Username");
             finished = true;
         }
 

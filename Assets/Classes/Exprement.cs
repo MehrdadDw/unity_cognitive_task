@@ -24,8 +24,8 @@ namespace Assets.Classes
         }
         public Exprement(float start_frac, GameObject dot_prefab, int tot_dots, float scale)
         {
-            _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .25f, (1f / 8f), (5f / 8f));
-            _RightExprement = new MiniExprement(dot_prefab, tot_dots, .25f, (5f / 8f), (5f / 8f));
+            _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .5f, -1, -(1f / 2f));
+            _RightExprement = new MiniExprement(dot_prefab, tot_dots, .5f, 1, -(1f / 2f));
             level = 0;
             _step = .03f;
             Max_inverse = 8;
@@ -37,22 +37,20 @@ namespace Assets.Classes
         {
             return Inverse_counter < Max_inverse;
         }
-        public void submit_answer(arrow user_answer)
+        public void button_submit(bool is_correct_answer)
         {
-            var is_correct_answer = current_answer == user_answer;
+            
             if (is_correct_answer != last_is_correct)
             {
                 //Inverse detected!
                 Inverse_counter++;
+                Debug.Log($"inverse {Inverse_counter}");
             }
             if (Inverse_counter == Max_inverse)
             {
                 Debug.LogWarning("level done");
             }
-            else
-            {
-                next_level(is_correct_answer);
-            }
+            last_is_correct = is_correct_answer;
 
 
         }
@@ -63,25 +61,54 @@ namespace Assets.Classes
         public void next_level(bool Correct)
         {
             current_answer = (arrow)(UnityEngine.Random.Range(0, 2));
+            var Show_side = (UnityEngine.Random.Range(0, 2));
             //TODO factor 3 change
             if (Correct)
                 _current_frac -= _step;
             else//wrong
                 _current_frac += 3 * _step;
 
+
             switch (current_answer)
             {
                 case arrow.left:
-                    _LeftExprement.Start_new(_current_frac, current_answer);
+                    if (Show_side == 0)
+                    {
+                        _LeftExprement.Start_new(_current_frac, current_answer);
+                        _RightExprement.Start_new(0, current_answer);
+                    }
+                    else
+                    {
+                        _RightExprement.Start_new(_current_frac, current_answer);
+                        _LeftExprement.Start_new(0, current_answer);
+                    }
+
                     break;
                 case arrow.right:
-                    _RightExprement.Start_new(_current_frac, current_answer);
+                    if (Show_side == 0)
+                    {
+                        _RightExprement.Start_new(_current_frac, current_answer);
+                        _LeftExprement.Start_new(0, current_answer); 
+                    }
+                    else
+                    {
+                        _LeftExprement.Start_new(_current_frac, current_answer);
+                        _RightExprement.Start_new(0, current_answer);
+                    }
                     break;
                 default:
                     Debug.LogError("step is not set");
                     break;
             }
+            if (_current_frac < 0)
+                _current_frac = 0;
+            else if (_current_frac > 1)
+                _current_frac = 1;
+            else
             level++;
+
+            button_submit(Correct);
+
         }
 
 

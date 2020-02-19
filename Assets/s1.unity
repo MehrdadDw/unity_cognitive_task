@@ -278,8 +278,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dot_prefab: {fileID: 1282963335519149995, guid: 09ac49898021cd843af833e92430134c,
     type: 3}
-  total_dots: 1000
-  interval_sec: 0
-  start_frac: 0
-  step_add_frac: 0
-  last_frac: 0
+  total_dots: 100
+  interval_sec: 4
+  start_frac: 0.2
+  step_add_frac: 0.01
+  scale: 0.25
