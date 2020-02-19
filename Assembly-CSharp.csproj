@@ -63,7 +63,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\arrow.cs" />
     <Compile Include="Assets\Classes\Exprement.cs" />
+    <Compile Include="Assets\Classes\MiniExprement.cs" />
+    <Compile Include="Assets\ExtentionHelper.cs" />
     <Compile Include="Assets\FileUtil.cs" />
     <Compile Include="Assets\p_move.cs" />
     <Compile Include="Assets\producer.cs" />

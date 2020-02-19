@@ -1,165 +1,89 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public static class Exprement
+namespace Assets.Classes
 {
-    static GameObject dot_prefab;
-    static int tot_num;
-    static float coherent_frac;
-    public static arrow answer;
-    public static List<GameObject> dot_objcts = new List<GameObject>();
-    public static float minX;
-    public static float maxX;
-    public static float minY;
-    public static float maxY;
-    public static void set_screen_bounds()
+    public class Exprement
     {
-        var mapX = 0;
-        var mapY = 0;
-        var vertExtent = Camera.main.GetComponent<Camera>().orthographicSize;
-        var horzExtent = vertExtent * Screen.width / Screen.height;
-
-        // Calculations assume map is position at the origin
-        minX = (float)(horzExtent - mapX / 2.0);
-        maxX = (float)(mapX / 2.0 - horzExtent);
-        minY = (float)(vertExtent - mapY / 2.0);
-        maxY = (float)(mapY / 2.0 - vertExtent);
-
-        //measure screen
-        //lowerLeft.x will be the X coordinate of the leftmost visible pixel
-        //leftbottom = Camera.main.ScreenToWorldPoint(new Vector3(minX, minY, 0));
-
-        //lowerRight.x will be the X coordinate of the rightmost visible pixel
-        //topright = Camera.main.ScreenToWorldPoint(new Vector3(maxX, maxY, 0));
-
-
-
-    }
-    public static void Finish()
-    {
-        clear();
-        Debug.Log("finished");
-    }
-    private static void create_coherents(float coherent_dts_num)
-    {
-     ;
-
-      
-        var const_speed_mag = Random.Range(3, 5);
-        answer = (arrow)Random.Range(0, 4);
-        Debug.Log(answer.ToString());
-        for (int i = 0; i < coherent_dts_num; i++)
+        public readonly MiniExprement _LeftExprement;
+        public readonly MiniExprement _RightExprement;
+        public int level { get; set; }
+        private int Inverse_counter { get; set; }
+        private bool last_is_correct { get; set; }
+        private arrow current_answer { get; set; }
+        private float _step { get; set; }
+        private float _current_frac { get; set; }
+        private readonly int Max_inverse;
+        public KeyCode Correct_keyCode()
         {
-            //random pos
-            var const_x_pos = Random.Range((float)minX, (float)maxX);
-            var const_y_pos = Random.Range((float)minY, (float)maxY);
-            var dot = GameObject.Instantiate(dot_prefab, new Vector3(const_x_pos, const_y_pos, 0), Quaternion.identity);
-            Exprement.dot_objcts.Add(dot);
-
-            dot.GetComponent<p_move>().speed_vector = answer.Arrow2direction();
-            dot.GetComponent<p_move>().speed_mag = const_speed_mag;
+            return current_answer.Answer_keycode();
         }
-    }
-
-    private static void create_random()
-    {
-        var const_x_speed = Random.Range(-10, 10);
-        var const_y_speed = Random.Range(-10, 10);
-        //random pos
-        var x_pos = Random.Range((float)minX, (float)maxX);
-        var y_pos = Random.Range((float)minY, (float)maxY);
-        var dot = GameObject.Instantiate(dot_prefab, new Vector3(x_pos, y_pos, 0), Quaternion.identity);
-        Exprement.dot_objcts.Add(dot);
-       
-        dot.GetComponent<p_move>().speed_vector = new Vector2(const_x_speed,const_y_speed) ;
-        dot.GetComponent<p_move>().speed_mag = Random.Range(1, 5); ;
-    }
-    public static void Start_new(int tot_dots, float Coherent_Frac, GameObject dotprefab)
-    {
-        set_screen_bounds();
-        clear();
-        dot_prefab = dotprefab;
-        tot_num = tot_dots;
-        coherent_frac = Coherent_Frac;
-
-        var coherent_dts_num = tot_num * Coherent_Frac;
-        var random_dts_num = tot_num - coherent_dts_num;
-        for (int i = 0; i < random_dts_num; i++)
+        public Exprement(float start_frac, GameObject dot_prefab, int tot_dots, float scale)
         {
-            create_random();
+            _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .25f, (1f / 8f), (5f / 8f));
+            _RightExprement = new MiniExprement(dot_prefab, tot_dots, .25f, (5f / 8f), (5f / 8f));
+            level = 0;
+            _step = .03f;
+            Max_inverse = 8;
+            _current_frac = start_frac;
+            //initiate
+            next_level(true);
         }
-        create_coherents(coherent_dts_num);
-    }
-    private static void clear()
-    {
-        foreach (var item in dot_objcts)
+        public bool IsInversionOK()
         {
-            try
+            return Inverse_counter < Max_inverse;
+        }
+        public void submit_answer(arrow user_answer)
+        {
+            var is_correct_answer = current_answer == user_answer;
+            if (is_correct_answer != last_is_correct)
             {
-                GameObject.Destroy(item);
+                //Inverse detected!
+                Inverse_counter++;
             }
-            catch (System.Exception)
+            if (Inverse_counter == Max_inverse)
             {
-
+                Debug.LogWarning("level done");
             }
+            else
+            {
+                next_level(is_correct_answer);
+            }
+
+
         }
-
-    }
-    
-
-    static Vector2 Arrow2direction(this arrow Arrow)
-    {
-        switch (Arrow)
+        /// <summary>
+        /// Graphic and logic new lvl
+        /// </summary>
+        /// <param name="Correct"></param>
+        public void next_level(bool Correct)
         {
-            case arrow.left:
-                return new Vector2(-1, 0);
-            case arrow.right:
-                return new Vector2(1, 0);
+            current_answer = (arrow)(UnityEngine.Random.Range(0, 2));
+            //TODO factor 3 change
+            if (Correct)
+                _current_frac -= _step;
+            else//wrong
+                _current_frac += 3 * _step;
 
-            case arrow.up:
-                return new Vector2(0, 1);
-
-            case arrow.down:
-                return new Vector2(0, -1);
-
-            default:
-                Debug.Log("arrow not set");
-                return Vector2.zero;
-
+            switch (current_answer)
+            {
+                case arrow.left:
+                    _LeftExprement.Start_new(_current_frac, current_answer);
+                    break;
+                case arrow.right:
+                    _RightExprement.Start_new(_current_frac, current_answer);
+                    break;
+                default:
+                    Debug.LogError("step is not set");
+                    break;
+            }
+            level++;
         }
-    }
-   public static KeyCode Answer_keycode()
-    {
-        switch (Exprement.answer)
-        {
-            case arrow.left:
-                return KeyCode.LeftArrow;
-                break;
-            case arrow.right:
-                return KeyCode.RightArrow;
 
-                break;
-            case arrow.up:
-                return KeyCode.UpArrow;
 
-                break;
-            case arrow.down:
-                return KeyCode.DownArrow;
-
-                break;
-            default:
-                Debug.Log("not relevant key");
-                return KeyCode.Space;
-                break;
-
-        }
     }
 }
-public enum arrow
-{
-    left, right,up,down
-}
-
-
-
