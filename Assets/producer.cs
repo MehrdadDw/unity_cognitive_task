@@ -90,6 +90,7 @@ public class producer : MonoBehaviour
                 current_lvl++;
                 next_time = DateTime.Now + TimeSpan.FromSeconds(interval_sec);
                 Exprement.next_level(true);
+               
             }
             else
             {
@@ -101,6 +102,8 @@ public class producer : MonoBehaviour
                 current_lvl++;
                 next_time = DateTime.Now + TimeSpan.FromSeconds(interval_sec);
                 Exprement.next_level(false);
+                
+
                 Debug.Log($"irrelevant key pressed");
             }
         }
