@@ -63,13 +63,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\arrow.cs" />
     <Compile Include="Assets\Classes\Exprement.cs" />
     <Compile Include="Assets\Classes\MiniExprement.cs" />
-    <Compile Include="Assets\ExtentionHelper.cs" />
-    <Compile Include="Assets\FileUtil.cs" />
-    <Compile Include="Assets\p_move.cs" />
-    <Compile Include="Assets\producer.cs" />
+    <Compile Include="Assets\Enums\arrow.cs" />
+    <Compile Include="Assets\Exensions\ArrowExtentions.cs" />
+    <Compile Include="Assets\Helpers\FileUtil.cs" />
+    <Compile Include="Assets\Scripts\p_move.cs" />
+    <Compile Include="Assets\Scripts\producer.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/mehrdad/Documents/task/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

@@ -9,6 +9,7 @@ namespace Assets.Classes
 {
     public class Exprement
     {
+        private Dictionary<int, bool> Result;
         public readonly MiniExprement _LeftExprement;
         public readonly MiniExprement _RightExprement;
         public int level { get; set; }
@@ -22,10 +23,11 @@ namespace Assets.Classes
         {
             return current_answer.Answer_keycode();
         }
-        public Exprement(float start_frac, GameObject dot_prefab, int tot_dots, float scale)
+        public Exprement(float start_frac, GameObject dot_prefab, int tot_dots, float scale,bool debug=false)
         {
-            _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .5f, -1, -(1f / 2f));
-            _RightExprement = new MiniExprement(dot_prefab, tot_dots, .5f, 1, -(1f / 2f));
+            Result = new Dictionary<int, bool>();
+            _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .6f,true, debug);
+            _RightExprement = new MiniExprement(dot_prefab, tot_dots, .6f,false, debug);
             level = 0;
             _step = .03f;
             Max_inverse = 8;
@@ -49,6 +51,9 @@ namespace Assets.Classes
             if (Inverse_counter == Max_inverse)
             {
                 Debug.LogWarning("level done");
+                FileUtil.save_result(Result, "Username");
+                _LeftExprement.Finish();
+                _RightExprement.Finish();
             }
             last_is_correct = is_correct_answer;
 
@@ -60,11 +65,13 @@ namespace Assets.Classes
         /// <param name="Correct"></param>
         public void next_level(bool Correct)
         {
+            Result.Add(level, Correct);
+
             current_answer = (arrow)(UnityEngine.Random.Range(0, 2));
             var Show_side = (UnityEngine.Random.Range(0, 2));
             //TODO factor 3 change
             if (Correct)
-                _current_frac -= _step;
+                _current_frac -=Mathf.Clamp(_current_frac, _step,1);
             else//wrong
                 _current_frac += 3 * _step;
 
@@ -104,7 +111,7 @@ namespace Assets.Classes
                 _current_frac = 0;
             else if (_current_frac > 1)
                 _current_frac = 1;
-            else
+            
             level++;
 
             button_submit(Correct);
