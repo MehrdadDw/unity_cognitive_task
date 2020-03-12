@@ -1,6 +1,7 @@
 ﻿using Assets;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MiniExprement
 {
@@ -56,6 +57,7 @@ public class MiniExprement
     {
         clear();
         Debug.Log("finished");
+        SceneManager.LoadScene("Menu");
     }
     private void create_coherents(float coherent_dts_num, arrow Direction)
     {

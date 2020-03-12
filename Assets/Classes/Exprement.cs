@@ -12,46 +12,63 @@ namespace Assets.Classes
         private Dictionary<int, bool> Result;
         public readonly MiniExprement _LeftExprement;
         public readonly MiniExprement _RightExprement;
+        public bool _TrainMode { get; set; }
         public int level { get; set; }
-        private int Inverse_counter { get; set; }
+      
+        private int EndLimit_counter { get; set; }
         private bool last_is_correct { get; set; }
-        private arrow current_answer { get; set; }
+        private arrow flowSide { get; set; }
+        private arrow Show_side { get; set; }
         private float _step { get; set; }
         private float _current_frac { get; set; }
-        private readonly int Max_inverse;
+        private readonly int _Max_Limit;
         public KeyCode Correct_keyCode()
         {
-            return current_answer.Answer_keycode();
+            return Show_side.Answer_keycode();
         }
-        public Exprement(float start_frac, GameObject dot_prefab, int tot_dots, float scale,bool debug=false)
+        public Exprement(float start_frac, GameObject dot_prefab, int tot_dots,int Max_Limit, float scale,bool isTrain,bool debug=false)
         {
             Result = new Dictionary<int, bool>();
             _LeftExprement = new MiniExprement(dot_prefab, tot_dots, .6f,true, debug);
             _RightExprement = new MiniExprement(dot_prefab, tot_dots, .6f,false, debug);
             level = 0;
             _step = .03f;
-            Max_inverse = 8;
+            _Max_Limit = Max_Limit;
             _current_frac = start_frac;
+            _TrainMode = isTrain;
             //initiate
             next_level(true);
         }
-        public bool IsInversionOK()
+        public bool IsRoofOK()
         {
-            return Inverse_counter < Max_inverse;
+            return EndLimit_counter <= _Max_Limit;
         }
         public void button_submit(bool is_correct_answer)
         {
-            
-            if (is_correct_answer != last_is_correct)
+
+            if (_TrainMode)
             {
-                //Inverse detected!
-                Inverse_counter++;
-                Debug.Log($"inverse {Inverse_counter}");
+                if (!is_correct_answer )
+                {
+                    //Inverse detected!
+                    EndLimit_counter++;
+                    Debug.Log($"inverse {EndLimit_counter}");
+                } 
             }
-            if (Inverse_counter == Max_inverse)
+            else
+            {
+                if (is_correct_answer != last_is_correct)
+                {
+                    //Inverse detected!
+                    EndLimit_counter++;
+                    Debug.Log($"inverse {EndLimit_counter}");
+                }
+            }
+            if (EndLimit_counter > _Max_Limit)
             {
                 Debug.LogWarning("level done");
-                FileUtil.save_result(Result, "Username");
+                if (!_TrainMode)
+                FileUtil.save_result(Result, Save.Name);
                 _LeftExprement.Finish();
                 _RightExprement.Finish();
             }
@@ -67,40 +84,40 @@ namespace Assets.Classes
         {
             Result.Add(level, Correct);
 
-            current_answer = (arrow)(UnityEngine.Random.Range(0, 2));
-            var Show_side = (UnityEngine.Random.Range(0, 2));
+            flowSide = (arrow)(UnityEngine.Random.Range(0, 2));
+             Show_side =(arrow) (UnityEngine.Random.Range(0, 2));
             //TODO factor 3 change
             if (Correct)
-                _current_frac -=Mathf.Clamp(_current_frac, _step,1);
+                _current_frac =Mathf.Clamp(_current_frac- _step, _step,1);
             else//wrong
                 _current_frac += 3 * _step;
 
-
-            switch (current_answer)
+            Debug.LogWarning($"farc is {_current_frac}");
+            switch (flowSide)
             {
                 case arrow.left:
-                    if (Show_side == 0)
+                    if (Show_side == arrow.left)
                     {
-                        _LeftExprement.Start_new(_current_frac, current_answer);
-                        _RightExprement.Start_new(0, current_answer);
+                        _LeftExprement.Start_new(_current_frac, flowSide);
+                        _RightExprement.Start_new(0, flowSide);
                     }
                     else
                     {
-                        _RightExprement.Start_new(_current_frac, current_answer);
-                        _LeftExprement.Start_new(0, current_answer);
+                        _RightExprement.Start_new(_current_frac, flowSide);
+                        _LeftExprement.Start_new(0, flowSide);
                     }
 
                     break;
                 case arrow.right:
-                    if (Show_side == 0)
+                    if (Show_side ==arrow.right)
                     {
-                        _RightExprement.Start_new(_current_frac, current_answer);
-                        _LeftExprement.Start_new(0, current_answer); 
+                        _RightExprement.Start_new(_current_frac, flowSide);
+                        _LeftExprement.Start_new(0, flowSide); 
                     }
                     else
                     {
-                        _LeftExprement.Start_new(_current_frac, current_answer);
-                        _RightExprement.Start_new(0, current_answer);
+                        _LeftExprement.Start_new(_current_frac, flowSide);
+                        _RightExprement.Start_new(0, flowSide);
                     }
                     break;
                 default:

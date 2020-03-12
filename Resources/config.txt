@@ -1,5 +1,9 @@
 last_frac	1
-step_add_frac	.03
-start_frac	.3
-interval_sec	3
-total_dots	300
+step_add_frac	.05
+start_frac	.1
+interval_sec	7
+total_dots	100
+Max_Limit_Task	8
+Max_Limit_Train	4
+is_Debug	false
+

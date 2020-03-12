@@ -68,8 +68,12 @@
     <Compile Include="Assets\Enums\arrow.cs" />
     <Compile Include="Assets\Exensions\ArrowExtentions.cs" />
     <Compile Include="Assets\Helpers\FileUtil.cs" />
+    <Compile Include="Assets\Scripts\menu_manager.cs" />
     <Compile Include="Assets\Scripts\p_move.cs" />
     <Compile Include="Assets\Scripts\producer.cs" />
+    <Compile Include="Assets\Scripts\Save.cs" />
+    <None Include="Assets\Shaders\blure.shader" />
+    <None Include="Assets\config.txt" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/mehrdad/Documents/task/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
