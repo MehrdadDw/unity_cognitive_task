@@ -1,5 +1,5 @@
-# task
-Random Dot Kinematogram (RDK) with Unity
+# Random Dot Kinematogram (RDK) with Unity
+
 
 ## This program consists of two secion : ##
 -Train section :  
