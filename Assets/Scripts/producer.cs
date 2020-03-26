@@ -36,6 +36,9 @@ public class producer : MonoBehaviour
 
     private Exprement Exprement;
     private MiniExprement Right_Exprement;
+
+    
+    public AudioClip AC;
     // Start is called before the first frame update
     void Start()
     {
@@ -94,6 +97,10 @@ public class producer : MonoBehaviour
     }
     private IEnumerator blink_blur()
     {
+        if (is_Train)
+        {
+          GetComponent<AudioSource>().PlayOneShot(AC);
+        }
         for (int i = 0; i < 3; i++)
         {
             _Blur_Image.enabled = false;
